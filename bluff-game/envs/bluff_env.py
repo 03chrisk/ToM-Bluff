@@ -284,11 +284,16 @@ class BluffEnv(AECEnv):
             raise RuntimeError("No play to challenge.")
 
         self.infos[agent]["cards_other_agent_played"] = 0
+        
+        if self._cards_played_from_rank == 0:
+            temp_rank = (self.current_rank -1) % len(RANKS)
+        else:
+            temp_rank = self.current_rank
 
         # Check if the last play was truthful
 
         is_truthful = all(
-            card == RANKS[self.current_rank] for card in self.current_claim
+            card == RANKS[temp_rank] for card in self.current_claim
         )
 
         if is_truthful:
@@ -314,7 +319,7 @@ class BluffEnv(AECEnv):
 
         # Reset the central pile and move to the next rank
         self.central_pile = []
-        self.current_rank = (self.current_rank + 1) % len(RANKS)
+        self.current_rank = (temp_rank + 1) % len(RANKS)
         self._cards_played_from_rank = 0
 
         # Handle action masks so that you cant challenge after challenge
